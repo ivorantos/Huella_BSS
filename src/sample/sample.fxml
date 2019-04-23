@@ -1,16 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-
-<AnchorPane fx:controller="sample.Controller" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="627.0" prefWidth="789.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Button fx:id="button1" alignment="BOTTOM_LEFT" layoutX="145.0" layoutY="464.0" mnemonicParsing="false" onAction="#chooseFile" text="Load image one" AnchorPane.leftAnchor="145.0" AnchorPane.topAnchor="464.0" />
-      <Button fx:id="button2" alignment="BOTTOM_RIGHT" layoutX="545.0" layoutY="464.0" mnemonicParsing="false" onAction="#chooseFile" text="Load image two" AnchorPane.rightAnchor="143.0" />
-      <ImageView fx:id="img_viewer1" fitHeight="300.0" fitWidth="300.0" layoutX="46.0" layoutY="103.0" pickOnBounds="true" preserveRatio="true" />
-      <ImageView fx:id="img_viewer2" fitHeight="300.0" fitWidth="300.0" layoutX="446.0" layoutY="103.0" pickOnBounds="true" preserveRatio="true" />
-      <Button fx:id="limpiar" layoutX="346.0" layoutY="551.0" mnemonicParsing="false" onAction="#clean" text="Clean all" />
-   </children>
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" prefHeight="640.0" prefWidth="720.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="sample.Controller">
+  <children>
+    <BorderPane minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <bottom>
+        <HBox alignment="CENTER" prefHeight="114.0" prefWidth="789.0">
+          <children>
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+              <children>
+                <Button fx:id="button1" alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#chooseFile" text="Load image one" />
+              </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+              <children>
+                <Button fx:id="limpiar" mnemonicParsing="false" onAction="#clean" text="Clean all" />
+              </children>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+              <children>
+                <Button fx:id="button2" alignment="BOTTOM_RIGHT" mnemonicParsing="false" onAction="#chooseFile" text="Load image two" />
+              </children>
+            </HBox>
+          </children>
+        </HBox>
+      </bottom>
+      <left>
+        <HBox alignment="CENTER_LEFT" prefHeight="422.0" prefWidth="300.0">
+          <children>
+            <ImageView fx:id="img_viewer1" fitHeight="300.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+          </children>
+          <BorderPane.margin>
+            <Insets left="50.0" />
+          </BorderPane.margin>
+        </HBox>
+      </left>
+      <right>
+        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0">
+          <children>
+            <ImageView fx:id="img_viewer2" fitHeight="300.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+          </children>
+          <BorderPane.margin>
+            <Insets right="50.0" />
+          </BorderPane.margin>
+        </HBox>
+      </right>
+    </BorderPane>
+  </children>
 </AnchorPane>
