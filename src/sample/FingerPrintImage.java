@@ -2,7 +2,9 @@ package sample;
 
 public class FingerPrintImage {
 
-    public enum Fase { CARGA, ESCALA_GR }
+
+
+    public enum Fase { CARGA, ESCALA_GR,HIST }
 
     private int [] [] imagen;//matriz de imagen
 
@@ -21,12 +23,18 @@ public class FingerPrintImage {
     }
 
     public int getWidth() {
-        return imagen [0].length;
+        return imagen.length;
     }
 
 
     public int getHeight() {
-        return (imagen.length/getWidth());
+
+        return imagen [0].length;//Longitud(vertical) de la primera casilla del vector 0 (horizontal)
+
+    }
+
+    public void setPixel(int i, int j, int valorNuevo) {
+        imagen [i] [j]=valorNuevo;
     }
 
 
