@@ -1,10 +1,12 @@
 package sample;
 
+import java.awt.image.BufferedImage;
+
 public class FingerPrintImage {
 
 
 
-    public enum Fase { CARGA, ESCALA_GR,HIST }
+    public enum Fase { CARGA, ESCALA_GR,HIST,BN }
 
     private int [] [] imagen;//matriz de imagen
 
@@ -16,9 +18,38 @@ public class FingerPrintImage {
         fase=Fase.CARGA;//por defecto al inicio
     }
 
+
     public FingerPrintImage(int[][] imagen, Fase fase) {
 
         this.imagen = imagen;
+        this.fase = fase;
+    }
+
+
+    /**
+     * Constructor por copia
+     * @param f
+     */
+    public FingerPrintImage(FingerPrintImage f) {
+
+        this.imagen = f.imagen;
+        this.fase = f.fase;
+    }
+
+    public FingerPrintImage(BufferedImage b, Fase fase) {
+        imagen = new int[b.getWidth()][b.getHeight()];//matriz del mismo tamaño
+
+        for (int i = 0; i < b.getWidth(); i++) {//anchura(numero de columnas y); va cambiando la x cartesiana
+            for (int j = 0; j < b.getHeight(); j++) {//altura (numero de filas x); va cambiando la y cartesiana
+
+                imagen[i][j] = b.getRGB(i, j);
+
+
+
+            }
+        }
+
+
         this.fase = fase;
     }
 
@@ -34,13 +65,13 @@ public class FingerPrintImage {
     }
 
     public void setPixel(int i, int j, int valorNuevo) {
-        imagen [i] [j]=valorNuevo;
+        imagen[i][j]=valorNuevo;
     }
 
 
     public int getPixel(int i, int j) {
 
-        return imagen [i] [j];
+        return imagen[i][j];
     }
 
 
