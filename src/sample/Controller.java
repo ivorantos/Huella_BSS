@@ -41,6 +41,7 @@ public class Controller {
 
     private FingerPrintImage image_finger_act;//fingerPrint de la imagen actual (se pisa constantemente)
 //    private Image image_act;//image de la imagen actual (se pisa constantemente)
+
     private FingerPrintImage image_finger_ant;//fingerPrint de la imagen anterior (Se mantiene hasta el inicio del siguiente paso)
 
     //pila de deshacer; controlar la imagen actual y actualizarla todo
@@ -133,7 +134,36 @@ metodo de show(conversion) imgRandom->Image?????
         }
 
 
-        img_viewer2.setImage(SwingFXUtils.toFXImage(buffer, null));//Buffer to image   para pintar
+        img_viewer2.setImage(SwingFXUtils.toFXImage(buffer, null));//Buffer to image para pintar
+
+    }
+
+
+    private void filterImg(){
+
+        //parte central de la imagen
+
+        for (int x=1;x<image_finger_act.getWidth()-1;x++){
+
+            for (int y=1;y<image_finger_act.getHeight()-1;y++){
+
+                int centro=image_finger_act.getPixel(x,y);//pixel central
+
+                int uno=image_finger_act.getPixel(x-1,y-1);
+                int dos=image_finger_act.getPixel(x-1,y);
+                int tres=image_finger_act.getPixel(x-1,y+1);
+                int cuatro=image_finger_act.getPixel(x,y-1);
+                int seis=image_finger_act.getPixel(x,y+1);
+                int siete=image_finger_act.getPixel(x+1,y-1);
+                int ocho=image_finger_act.getPixel(x+1,y);
+                int nueve=image_finger_act.getPixel(x+1,y+1);
+
+                int f1= centro | dos & ocho & (cuatro | seis) | cuatro & seis & (dos | ocho);
+                int f2=centro&((uno | dos | cuatro) & (seis | ocho | nueve) | (dos | tres | seis) & (cuatro | siete | ocho));
+
+                image_finger_act.setPixel(x,y,f1|f2);//le pongo la or de los dos
+            }
+        }
 
     }
 
@@ -229,6 +259,16 @@ metodo de show(conversion) imgRandom->Image?????
                 Show(0);
 
                 break;
+
+            case "filtros":
+                image_finger_ant=new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+                filterImg();
+                Show(0);
+
+
+
+
+
 
         }
 
