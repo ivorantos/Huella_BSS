@@ -6,7 +6,7 @@ public class FingerPrintImage {
 
 
 
-    public enum Fase { CARGA, ESCALA_GR,HIST,BN }
+    public enum Fase { CARGA, ESCALA_GR,HIST,BN,FILTER,THIN}
 
     private int [] [] imagen;//matriz de imagen
 

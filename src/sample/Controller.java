@@ -2,24 +2,33 @@ package sample;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
-import com.sun.javafx.iio.ImageStorage;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
+import java.awt.Point;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
+
+  final private static int[][] nbrs = { { 0, -1 }, { 1, -1 }, { 1, 0 }, { 1, 1 }, { 0, 1 }, { -1, 1 }, { -1, 0 }, { -1, -1 },{ 0, -1 } };
+
+  final private static int[][][] nbrGroups = {{{0, 2, 4}, {2, 4, 6}}, {{0, 2, 6},{0, 4, 6}}};
+
+    static List<Point> toWhite = new ArrayList<Point>();
+
+
+
 
     @FXML
     private ImageView img_viewer1;
@@ -159,9 +168,16 @@ metodo de show(conversion) imgRandom->Image?????
                 int nueve=image_finger_act.getPixel(x+1,y+1);
 
                 int f1= centro | dos & ocho & (cuatro | seis) | cuatro & seis & (dos | ocho);
-                int f2=centro&((uno | dos | cuatro) & (seis | ocho | nueve) | (dos | tres | seis) & (cuatro | siete | ocho));
 
-                image_finger_act.setPixel(x,y,f1|f2);//le pongo la or de los dos
+                image_finger_act.setPixel(x,y,f1);//le pongo valor de filtro 1
+
+                int f2=centro&((uno | dos | cuatro) & (seis | ocho | nueve) | (dos | tres | seis) & (cuatro | siete | ocho));//calculo f2 con valores de f1
+
+                image_finger_act.setPixel(x,y,f2);//le pongo valor de filtro 2
+
+                image_finger_act.setFase(FingerPrintImage.Fase.FILTER);
+
+
             }
         }
 
@@ -206,6 +222,89 @@ metodo de show(conversion) imgRandom->Image?????
         }
 
     }
+
+    public void thinning(){
+
+        boolean firstStep = false;
+        boolean hasChanged;
+
+        do {
+            hasChanged = false;
+            firstStep = !firstStep;
+
+            for (int i = 1; i < image_finger_act.getWidth() - 1; i++) {
+                for (int j = 1; j < image_finger_act.getHeight() - 1; j++) {
+
+                    if (image_finger_act.getImagen()[i][j] != 0)
+                        continue;
+
+                    int nv = numNeighbors(i, j);
+                    if (nv < 2 || nv > 6)
+                        continue;
+
+                   int tr=transitions(i, j);
+
+                      if ( tr!=1 || tr!=2 && EvenOddcomp(i,j,i+j%2==0 ? 0 : 1))
+                            continue;
+
+
+
+                    if (!atLeastOneIsWhite(i, j, firstStep ? 0 : 1))
+                        continue;
+
+                    toWhite.add(new Point(i, j));
+                    hasChanged = true;
+                }
+            }
+
+            for (Point p : toWhite)
+                image_finger_act.getImagen()[p.x][p.y] = 1;
+                toWhite.clear();
+
+        } while (firstStep || hasChanged);
+
+
+        Show(0);
+
+
+
+
+    }
+
+    private Boolean EvenOddcomp(int i, int j,int odd) {
+
+        Boolean b1;
+
+        int v []=new int[nbrs.length-1];
+
+        for (int x = 0; x < nbrs.length - 1; x++) {
+
+
+                v[x] = image_finger_act.getImagen()[i + nbrs[x][1]][j + nbrs[x][0]];
+            }
+
+        if(odd==0){
+
+            //p2xp8=1&&p5=0
+            //p6xp8=1&&p3xp4xp7=1
+            b1=v[0]*v[6]==1&& v[3]==0 || v[4]*v[6]==1&&v[1]*v[2]*v[5]==1;
+
+        }
+
+        else{
+
+            //p4xp6=1&&p9=0
+            //p4xp2=1&&p3xp7xp8=1
+            b1=v[2]*v[4]==1&&v[7]==0 || v[2]*v[0]==1&&v[1]*v[5]*v[6]==1;
+
+        }
+
+
+    return b1;
+
+    }
+
+
 
 
     public void main(ActionEvent event) {
@@ -315,6 +414,59 @@ metodo de show(conversion) imgRandom->Image?????
         }
 
 
+    }
+
+
+    /**
+     * Calcula el numero de vecinos (1) que tiene el pixel x,y
+     * dadas.
+     *
+     * @param fila
+     * @param columna
+     * @return vecinos
+     */
+    private int numNeighbors(int fila, int columna) {
+
+        int vecinos = 0;
+        for (int i = 0; i < nbrs.length - 1; i++)
+            if (image_finger_act.getImagen()[fila + nbrs[i][1]][columna + nbrs[i][0]] == 0)//no entiendo porque igual a cero si esos son blancos
+                vecinos++;
+
+        return vecinos;
+    }
+
+    /**
+     * Calcula el numero de transiciones de cero a uno en los pixeles vecinos al (x,y).
+     *
+     * @param x
+     * @param y
+     * @return transacciones
+     */
+    private int transitions(int x, int y) {
+
+        int transitions = 0;
+
+        for (int i = 0; i < nbrs.length - 1; i++)
+            if (image_finger_act.getImagen()[x + nbrs[i][1]][y + nbrs[i][0]] == 1) {//transiciones de 1 a 0 porque¿?
+                if (image_finger_act.getImagen()[x + nbrs[i + 1][1]][y + nbrs[i + 1][0]] == 0)
+                    transitions++;
+            }
+        return transitions;
+    }
+
+
+    private boolean atLeastOneIsWhite(int r, int c, int step) {
+        int count = 0;
+        int[][] group = nbrGroups[step];
+        for (int i = 0; i < 2; i++)
+            for (int j = 0; j < group[i].length; j++) {
+                int[] nbr = nbrs[group[i][j]];
+                if (image_finger_act.getImagen()[r + nbr[1]][c + nbr[0]] == 1) {
+                    count++;
+                    break;
+                }
+            }
+        return count > 1;
     }
 
 

@@ -64,5 +64,6 @@
     </HBox>
       <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0" prefHeight="14.0" prefWidth="323.0" showTickLabels="true" value="127.0" visible="false" />
       <Label fx:id="umbral" layoutX="379.0" layoutY="684.0" text="Umbral:" visible="false" />
+      <Button fx:id="b" layoutX="679.0" layoutY="705.0" mnemonicParsing="false" onAction="#thinning" text="Button" />
   </children>
 </AnchorPane>
