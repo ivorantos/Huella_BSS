@@ -20,8 +20,12 @@ public class FingerPrintImage {
 
 
     public FingerPrintImage(int[][] imagen, Fase fase) {
-
-        this.imagen = imagen;
+        this.imagen = new int[imagen.length][imagen[0].length];
+        for(int i=0; i<imagen.length;i++){
+            for(int j=0; j<imagen[0].length;j++){
+                this.imagen[i][j]=imagen[i][j];
+            }
+        }
         this.fase = fase;
     }
 
@@ -32,17 +36,22 @@ public class FingerPrintImage {
      */
     public FingerPrintImage(FingerPrintImage f) {
 
-        this.imagen = f.imagen;
+        this.imagen = new int[f.imagen.length][f.imagen[0].length];
+        for(int i=0; i<f.imagen.length;i++){
+            for(int j=0; j<f.imagen[0].length;j++){
+                this.imagen[i][j]=f.imagen[i][j];
+            }
+        }
         this.fase = f.fase;
     }
 
     public FingerPrintImage(BufferedImage b, Fase fase) {
-        imagen = new int[b.getWidth()][b.getHeight()];//matriz del mismo tamaño
+        this.imagen = new int[b.getWidth()][b.getHeight()];//matriz del mismo tamaño
 
         for (int i = 0; i < b.getWidth(); i++) {//anchura(numero de columnas y); va cambiando la x cartesiana
             for (int j = 0; j < b.getHeight(); j++) {//altura (numero de filas x); va cambiando la y cartesiana
 
-                imagen[i][j] = b.getRGB(i, j);
+                this.imagen[i][j] = b.getRGB(i, j);
 
 
 
@@ -92,6 +101,27 @@ public class FingerPrintImage {
         this.fase = fase;
 
     }
+
+    public BufferedImage getBuffer(int modo){
+
+        BufferedImage buffer = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);//buffered salida
+
+        for (int i = 0; i < this.getWidth(); i++) {//anchura(numero de columnas y); va cambiando la x cartesiana
+            for (int j = 0; j < this.getHeight(); j++) {//altura (numero de filas x); va cambiando la y cartesiana
+
+
+                int valor = this.getPixel(i, j);
+                if (modo == 0) {//B/N
+                    valor = valor * 255;
+                }
+                int pixelRGB = (255 << 24 | valor << 16 | valor << 8 | valor);
+                buffer.setRGB(i, j, pixelRGB);
+            }
+        }
+        return buffer;
+    }
+
+
 
 
 }
