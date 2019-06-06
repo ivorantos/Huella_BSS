@@ -134,8 +134,6 @@ metodo de show(conversion) imgRandom->Image?????
      */
     private void Show(int modo) {
 
-        ColorAdjust colorAdjust = new ColorAdjust();
-        colorAdjust.setBrightness(0);
 
 
 
@@ -517,6 +515,8 @@ metodo de show(conversion) imgRandom->Image?????
 
                 image_finger_ant=new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
                 Hist2BN((int)slider.getValue());
+//                interest_region();
+
                 Show(0);
 
                 break;
@@ -791,10 +791,14 @@ metodo de show(conversion) imgRandom->Image?????
         int c=0;
 
         int x=0;
+        int y=0;
+        int xi=0;
+        int yi=0;
 
-        Boolean first=false;
+
 
         for (int i=0;i<image_finger_act.getWidth();i++){
+            c=0;
             for (int j=0;j<image_finger_act.getHeight();j++){
 
                 if(image_finger_act.getPixel(i,j)==0)//negro
@@ -803,13 +807,47 @@ metodo de show(conversion) imgRandom->Image?????
             }
 
             if(c>25){
-                first=true;
+
                 x=i;
+                break;
+            }
+        }
+
+        c=0;
+
+        for (int i=image_finger_act.getWidth()-1;i>=0;i--){
+            for (int j=image_finger_act.getHeight()-1;j>=0;j--) {
+
+                if(image_finger_act.getPixel(i,j)==0)//negro
+                    c++;
+              }
+
+            if(c>25) {
+
+                xi = i;
+                break;
+            }
+        }
+
+            for (int j=0;j<image_finger_act.getHeight();j++) {
+
+                if (image_finger_act.getPixel(x,j)==0)//primer pixel negro en la fila marcada por arriba
+                    y=j;
+
+
             }
 
 
 
+            for (int j=image_finger_act.getHeight()-1;j>0;j--) {
+
+                if (image_finger_act.getPixel(x,j)==0)
+                    yi=j;
+
         }
+
+
+        image_finger_act=new FingerPrintImage(image_finger_act,x,y,xi,yi);
 
 
     }

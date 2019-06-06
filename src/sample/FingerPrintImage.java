@@ -19,13 +19,14 @@ public class FingerPrintImage {
     }
 
 
-    public FingerPrintImage(int[][] imagen, Fase fase) {
-        this.imagen = new int[imagen.length][imagen[0].length];
-        for(int i=0; i<imagen.length;i++){
-            for(int j=0; j<imagen[0].length;j++){
-                this.imagen[i][j]=imagen[i][j];
-            }
-        }
+    public FingerPrintImage(int[][] img, Fase fase) {
+
+        imagen=new int[img.length][img[0].length];
+
+        imagen=img.clone();
+
+
+
         this.fase = fase;
     }
 
@@ -38,6 +39,31 @@ public class FingerPrintImage {
 
         imagen=f.getImagen();
         this.fase = f.fase;
+    }
+
+    public FingerPrintImage(FingerPrintImage f,int x,int y,int xi,int yi){
+
+        fase=f.fase;
+        imagen=new int[xi-x][yi-y];//+1???
+
+        for (int i=x;i<xi;i++){
+            for (int j=y;y<yi;y++){
+
+                int r=i-x;
+                int c=j-y;
+
+                imagen[r][c]=f.getPixel(i,j);
+
+
+
+
+            }
+        }
+
+
+
+
+
     }
 
     public FingerPrintImage(BufferedImage b, Fase fase) {
