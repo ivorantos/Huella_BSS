@@ -54,6 +54,8 @@ public class Controller {
 
     private FingerPrintImage image_finger_ant;//fingerPrint de la imagen anterior (Se mantiene hasta el inicio del siguiente paso)
 
+    private ArrayList <minucia> minucias;
+
 
 
 
@@ -264,7 +266,7 @@ metodo de show(conversion) imgRandom->Image?????
 
                    int tr=transitions(i, j);
 
-                      if ( tr!=1 || tr!=2 && EvenOddcomp(i,j,i+j%2==0 ? 0 : 1))
+                      if ( tr!=1 || tr!=2 && EvenOddcomp(i,j,i+j%2==0 ? 0 : 1) )
                             continue;
 
 
@@ -320,129 +322,149 @@ metodo de show(conversion) imgRandom->Image?????
 
     }
 
-    public void minucias() {
-        int[] vecinos = new int[9];
-        int sumatorio = 0;
-        int corte=0;
-        int bifurcacion=0;
-        BufferedImage b=image_finger_act.getBuffer(0);
-
-
-        for (int i = 1; i < image_finger_act.getWidth()- 1; i++) {
-            for (int j = 1; j < image_finger_act.getHeight() - 1; j++) {
-
-                if (image_finger_act.getPixel(i,j)== 0) { // es arista
-                    // tiene ocho vecinos
-                    // i = fila, j = columna
-                    vecinos[0] = image_finger_act.getPixel(i,j+1);
-                    vecinos[1] = image_finger_act.getPixel(i-1,j+1);
-                    vecinos[2] = image_finger_act.getPixel(i-1,j);
-                    vecinos[3] = image_finger_act.getPixel(i-1,j-1);
-                    vecinos[4] = image_finger_act.getPixel(i,j-1);
-                    vecinos[5] = image_finger_act.getPixel(i+1,j-1);
-                    vecinos[6] = image_finger_act.getPixel(i+1,j);
-                    vecinos[7] = image_finger_act.getPixel(i+1,j+1);
-                    vecinos[8] = image_finger_act.getPixel(i,j+1);
-
-                    for (int v = 0; v < vecinos.length - 1; v++) {
-                        sumatorio = sumatorio + Math.abs(vecinos[v] - vecinos[v + 1]);
-                    }
-                    sumatorio/=2; // crossingNumber
-
-                    // modificamos los valores de la minucia con las coordenadas x e y y el tipo de
-                    // minucia (segun su crossingNumber,
-                    // 1 para los cortes y 3 para las bifurcaciones) y las añadimos a la lista de
-                    // minucias
-                    if(sumatorio==1) {
-                        corte++;
-
-                        b.setRGB(i,j, Color.MAGENTA.getRGB());
-                    }
-
-
-
-                    if(sumatorio==3) {
-                        bifurcacion++;
-
-                        b.setRGB(i,j, Color.GREEN.getRGB());
-
-                    }
-
-
-                    sumatorio=0;
-                }
-
-            }
-        }
-
-        img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//Buffer to image para pintar
-//
-//
-        System.out.println("Cortes: "+corte+" Bifurcaciones: "+bifurcacion);
-
-    }
-
-
-
-//    public void minucias(){
-//
-//        int v []=new int[nbrs.length-1];
-//
-//        int s,corte,bifurcacion=0;
-//
-//        corte=s=bifurcacion;
+//    public void minucias() {
+//        int[] vecinos = new int[9];
+//        int sumatorio = 0;
+//        int corte=0;
+//        int bifurcacion=0;
 //        BufferedImage b=image_finger_act.getBuffer(0);
 //
 //
-//        for (int x = 1; x < image_finger_act.getWidth() - 1; x++) {
-//            for (int y = 1; y < image_finger_act.getHeight() - 1; y++) {
+//        for (int i = 1; i < image_finger_act.getWidth()- 1; i++) {
+//            for (int j = 1; j < image_finger_act.getHeight() - 1; j++) {
 //
-//                if (image_finger_act.getPixel(x,y)==0) {//negro
+//                if (image_finger_act.getPixel(i,j)== 0) { // es arista
+//                    // tiene ocho vecinos
+//                    // i = fila, j = columna
+//                    vecinos[0] = image_finger_act.getPixel(i,j+1);
+//                    vecinos[1] = image_finger_act.getPixel(i-1,j+1);
+//                    vecinos[2] = image_finger_act.getPixel(i-1,j);
+//                    vecinos[3] = image_finger_act.getPixel(i-1,j-1);
+//                    vecinos[4] = image_finger_act.getPixel(i,j-1);
+//                    vecinos[5] = image_finger_act.getPixel(i+1,j-1);
+//                    vecinos[6] = image_finger_act.getPixel(i+1,j);
+//                    vecinos[7] = image_finger_act.getPixel(i+1,j+1);
+//                    vecinos[8] = image_finger_act.getPixel(i,j+1);
 //
-//                    for (int i = 0; i < nbrs.length - 1; i++) {
-//
-//                        v[i] = image_finger_act.getImagen()[x + nbrs[i][1]][y + nbrs[i][0]];
+//                    for (int v = 0; v < vecinos.length - 1; v++) {
+//                        sumatorio = sumatorio + Math.abs(vecinos[v] - vecinos[v + 1]);
 //                    }
+//                    sumatorio/=2; // crossingNumber
 //
-//
-//
-//                    for (int w = 0; w < v.length - 1; w++) {
-//                        s = s + Math.abs(v[w] - v[w + 1]);
-//                    }
-//
-//                    s/=2;
-//
-//                    if(s==1) {
+//                    // modificamos los valores de la minucia con las coordenadas x e y y el tipo de
+//                    // minucia (segun su crossingNumber,
+//                    // 1 para los cortes y 3 para las bifurcaciones) y las añadimos a la lista de
+//                    // minucias
+//                    if(sumatorio==1) {
 //                        corte++;
 //
-//                        b.setRGB(x,y, Color.MAGENTA.getRGB());
+//                        b.setRGB(i,j, Color.MAGENTA.getRGB());
 //                    }
 //
 //
 //
-//                    if(s==3) {
+//                    if(sumatorio==3) {
 //                        bifurcacion++;
 //
-//                        b.setRGB(x,y, Color.GREEN.getRGB());
+//                        b.setRGB(i,j, Color.GREEN.getRGB());
 //
 //                    }
 //
 //
-//                    s=0;
-//
+//                    sumatorio=0;
 //                }
 //
-//
 //            }
-//
 //        }
 //
 //        img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//Buffer to image para pintar
-//
-//
+////
+////
 //        System.out.println("Cortes: "+corte+" Bifurcaciones: "+bifurcacion);
 //
 //    }
+//
+
+
+    public void minucias(){
+
+        int v []=new int[9];
+
+        int s=0;
+        int corte=0;
+        int bifurcacion=0;
+
+        minucias=new ArrayList<>();
+
+        BufferedImage b=image_finger_act.getBuffer(0);
+
+
+        for (int x = 1; x < image_finger_act.getWidth() - 1; x++) {
+            for (int y = 1; y < image_finger_act.getHeight() - 1; y++) {
+
+                if (image_finger_act.getPixel(x,y)==0) {//negro
+
+                    v[0] = image_finger_act.getPixel(x,y+1);
+                    v[1] = image_finger_act.getPixel(x-1,y+1);
+                    v[2] = image_finger_act.getPixel(x-1,y);
+                    v[3] = image_finger_act.getPixel(x-1,y-1);
+                    v[4] = image_finger_act.getPixel(x,y-1);
+                    v[5] = image_finger_act.getPixel(x+1,y-1);
+                    v[6] = image_finger_act.getPixel(x+1,y);
+                    v[7] = image_finger_act.getPixel(x+1,y+1);
+                    v[8] = image_finger_act.getPixel(x,y+1);
+
+
+
+                    for (int w = 0; w < v.length - 1; w++) {
+                        s = s + Math.abs(v[w] - v[w + 1]);
+                    }
+
+                    s/=2;
+
+                    if(s==1||s==3) {
+
+                        minucias.add(new minucia(s,new Point(x,y)));
+
+
+
+                        b.setRGB(x-1,y, Color.MAGENTA.getRGB());
+                        b.setRGB(x+1,y, Color.MAGENTA.getRGB());
+                        b.setRGB(x,y-1, Color.MAGENTA.getRGB());
+                        b.setRGB(x,y+1, Color.MAGENTA.getRGB());
+                    }
+
+                    s=0;
+
+                }
+
+
+            }
+
+        }
+
+
+
+
+            for(minucia m:minucias){
+
+                if(m.tipo==1)
+                    corte++;
+                else
+                    bifurcacion++;
+
+            }
+
+            System.out.println("Cortes: "+corte+" Bifurcaciones: "+bifurcacion);
+
+
+
+
+
+
+        img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//Buffer to image para pintar
+
+    }
 
 
 
@@ -620,13 +642,286 @@ metodo de show(conversion) imgRandom->Image?????
     }
 
 
+    private Point nextBlack(Point p,ArrayList<Point>w){
+
+        Point v []=new Point[nbrs.length-1];//vecinos
+        Point next=new Point(9,9,-88);//siguiente nulo
+        Boolean x=false;
+
+        for (int i = 0; i < nbrs.length - 1; i++) {
+
+            Point punto=new Point((p.x + nbrs[i][1]),(p.y + nbrs[i][0]),image_finger_act.getImagen()[ (p.x + nbrs[i][1])][ (p.y + nbrs[i][0])]);
+            v[i]=punto;
+        }
+
+        for(Point c:v){
+
+            if(c.valor==0 && !w.contains(c))//es negro;forma parte del recorrido de la minucia y no esta visitado
+                next=c;
+
+
+        }
+
+        return next;
+
+    }
+
+    private double calculate(Point l){
+
+        double result=0;
+
+
+        if (l.x != 0) { // No divisiones entre 0
+            result = l.y / l.x;
+            result = (Math.atan(result)); // Arc tg
+            result = Math.toDegrees(result); //  grados.
+        } else {
+            if (l.y != 0 && l.x == 0) {
+                result = 90;
+            }
+
+
+        }
+
+        System.out.println("Angulo: "+result);
+
+
+        return result;
+
+
+
+    }
+
+    private void pixels(ArrayList<Point> x,int p,Point act){
+
+        if(p<6){//si no es ultima iteracion
+
+            x.add(act);//añado actual a visitados
+
+            Point next=nextBlack(act,x);
+            p++;//inc paso
+
+            if(next.valor!=-88)//-88 seria que no ha encontrado siguiente->error
+            pixels(x,p,next);//vuelvo a llmada recursiva con el siguiente
+
+        }
+
+        //cuando no se cumpla no hago nada porque ya tengo los visitados llenos que es lo que quiero para calcularlo abajo
+    }
+
+    public void angles () {
+
+        double result = 0;
+        Point Gx_Gy;
+        double [] ang_bif=new double[3];
+
+
+        ArrayList<Point> visitados = new ArrayList<>();
+
+        for (minucia m : minucias) {//cada minucia
+
+            if (m.tipo == 1) {//minucias corte
+
+                visitados.clear();
+
+                pixels(visitados, 0, m.cordenadas);//visitados (vacio),paso 0,y punto actual minucia
+
+                Gx_Gy = new Point();
+
+                Gx_Gy.x = visitados.get(visitados.size() - 1).x - visitados.get(0).x;//xf-xi
+                Gx_Gy.y = visitados.get(visitados.size() - 1).y - visitados.get(0).y;//yf-yi
+
+                calculate(Gx_Gy);
+
+            }
+
+
+            else{//bifurcacion tiene que sacar 6 vecinos por rama 18
+
+                visitados.clear();
+
+                for(int z=0;z<3;z++){//tres ramas de la bifurcacion
+
+                    pixels(visitados, 0, m.cordenadas);//visitados (lleno),paso 0,y punto actual minucia
+
+                    Gx_Gy = new Point();
+
+                    try {
+                        Gx_Gy.x = visitados.get(visitados.size() - 1).x - visitados.get(6*z).x;//xf-xi
+                        Gx_Gy.y = visitados.get(visitados.size() - 1).y - visitados.get(6*z).y;//yf-yi
+
+                    } catch (Exception e) {
+                    }
+
+                    finally {
+                        double f=0;
+
+
+                        ang_bif[z]=calculate(Gx_Gy);//guardo los angulos de cada
+
+                        for (double d:ang_bif){
+                            f+=d;
+                        }
+
+                        System.out.println("ang bifurcacion: "+f/3);
+
+
+
+                    }
+
+
+
+
+                }
+
+
+
+
+
+            }
+
+
+        }
+
+    }
+
+
+    private void interest_region(){
+
+        int c=0;
+
+        int x=0;
+
+        Boolean first=false;
+
+        for (int i=0;i<image_finger_act.getWidth();i++){
+            for (int j=0;j<image_finger_act.getHeight();j++){
+
+                if(image_finger_act.getPixel(i,j)==0)//negro
+                    c++;
+
+            }
+
+            if(c>25){
+                first=true;
+                x=i;
+            }
+
+
+
+        }
+
+
+    }
+
+
     public static void main(String[] args) {
 
 
+    }
+
+    class minucia{
+
+        minucia(){
+
+        }
+
+        public int getTipo() {
+            return tipo;
+        }
+
+        public void setTipo(int tipo) {
+            this.tipo = tipo;
+        }
+
+        public Point getCordenadas() {
+            return cordenadas;
+        }
+
+        public void setCordenadas(Point cordenadas) {
+            this.cordenadas = cordenadas;
+        }
+
+        public minucia(int tipo, Point cordenadas) {
+            this.tipo = tipo;
+
+            this.cordenadas = cordenadas;
+        }
+
+        int tipo;//1 corte
+        Point cordenadas;//3 bifurcacion
 
 
 
 
     }
 
+
+    class Point{
+
+        Point(){
+
+        }
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public void setY(int y) {
+            this.y = y;
+        }
+
+        public int getValor() {
+            return valor;
+        }
+
+        public void setValor(int valor) {
+            this.valor = valor;
+        }
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+            this.valor = -9999;
+        }
+
+        public Point(int x, int y, int valor) {
+            this.x = x;
+            this.y = y;
+            this.valor = valor;
+        }
+
+        int x;
+        int y;
+        int valor;
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+
+        /* Check if o is an instance of Point or not
+          "null instanceof [type]" also returns false */
+            if (!(o instanceof Point)) {
+                return false;
+            }
+
+            Point p = (Point) o;
+
+            // Compare the data members and return accordingly
+            return  this.x==((Point) o).x && this.y== ((Point) o).y;
+        }
+    }
+
 }
+
+
+

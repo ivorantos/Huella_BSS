@@ -36,12 +36,7 @@ public class FingerPrintImage {
      */
     public FingerPrintImage(FingerPrintImage f) {
 
-        this.imagen = new int[f.imagen.length][f.imagen[0].length];
-        for(int i=0; i<f.imagen.length;i++){
-            for(int j=0; j<f.imagen[0].length;j++){
-                this.imagen[i][j]=f.imagen[i][j];
-            }
-        }
+        imagen=f.getImagen();
         this.fase = f.fase;
     }
 

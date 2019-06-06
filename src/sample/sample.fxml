@@ -66,5 +66,6 @@
       <Label fx:id="umbral" layoutX="379.0" layoutY="684.0" text="Umbral:" visible="false" />
       <Button fx:id="b" layoutX="679.0" layoutY="705.0" mnemonicParsing="false" onAction="#main" text="Button" />
       <Button fx:id="b1" layoutX="574.0" layoutY="718.0" mnemonicParsing="false" onAction="#minucias" text="minuiowsñ" />
+      <Button layoutX="384.0" layoutY="594.0" mnemonicParsing="false" onAction="#angles" text="angles" fx:id="xxx" />
   </children>
 </AnchorPane>
