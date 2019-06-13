@@ -82,7 +82,7 @@
                         <Insets left="15.0" top="-10.0" />
                      </HBox.margin>
                   </JFXButton>
-                  <Button fx:id="b" mnemonicParsing="false" onAction="#main" text="Thin">
+                  <Button fx:id="thin" mnemonicParsing="false" onAction="#main" text="Thin">
                      <HBox.margin>
                         <Insets left="15.0" top="-10.0" />
                      </HBox.margin>
@@ -94,12 +94,12 @@
         </HBox>
         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="b1" mnemonicParsing="false" onAction="#minucias" text="minucias">
+                  <Button fx:id="min" mnemonicParsing="false" onAction="#main" text="minucias">
                      <HBox.margin>
                         <Insets left="15.0" top="-10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#angles" text="angles" fx:id="xxx">
+                  <Button fx:id="angulos" mnemonicParsing="false" onAction="#main" text="angles">
                      <HBox.margin>
                         <Insets left="12.0" top="-10.0" />
                      </HBox.margin>

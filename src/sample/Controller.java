@@ -18,7 +18,9 @@ import java.awt.*;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,9 @@ public class Controller {
   final private static int[][][] nbrGroups = {{{0, 2, 4}, {2, 4, 6}}, {{0, 2, 6},{0, 4, 6}}};
 
     static List<Point> toWhite = new ArrayList<Point>();
+
+    private int corte=0;
+    private int bifurcacion=0;
 
 
     @FXML
@@ -54,7 +59,11 @@ public class Controller {
 
     private FingerPrintImage image_finger_ant;//fingerPrint de la imagen anterior (Se mantiene hasta el inicio del siguiente paso)
 
+    @FXML
     private ArrayList <minucia> minucias;
+
+    @FXML
+    private Button min;
 
 
 
@@ -384,14 +393,11 @@ metodo de show(conversion) imgRandom->Image?????
 //
 
 
-    public void minucias(){
+    private void minucias(){
 
         int v []=new int[9];
 
         int s=0;
-        int corte=0;
-        int bifurcacion=0;
-
         minucias=new ArrayList<>();
 
         BufferedImage b=image_finger_act.getBuffer(0);
@@ -441,9 +447,6 @@ metodo de show(conversion) imgRandom->Image?????
 
         }
 
-
-
-
             for(minucia m:minucias){
 
                 if(m.tipo==1)
@@ -453,14 +456,8 @@ metodo de show(conversion) imgRandom->Image?????
 
             }
 
-            System.out.println("Cortes: "+corte+" Bifurcaciones: "+bifurcacion);
 
-
-
-
-
-
-        img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//Buffer to image para pintar
+        img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//se muestra aqui directamente porque se usa el buffer con las minucias marcadas
 
     }
 
@@ -529,13 +526,22 @@ metodo de show(conversion) imgRandom->Image?????
                 break;
 
 
-            case "b":
+            case "thin":
                 image_finger_ant=new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
                 thinning();
                 Show(0);
                 break;
 
+            case "min":
+                image_finger_ant=new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+                minucias();//ya se muestra desde aqui
+                break;
 
+            case "angulos":
+                image_finger_ant=new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+                angles();
+                record_log();
+                break;
 
 
 
@@ -683,8 +689,6 @@ metodo de show(conversion) imgRandom->Image?????
 
         }
 
-        System.out.println("Angulo: "+result);
-
 
         return result;
 
@@ -709,16 +713,19 @@ metodo de show(conversion) imgRandom->Image?????
         //cuando no se cumpla no hago nada porque ya tengo los visitados llenos que es lo que quiero para calcularlo abajo
     }
 
-    public void angles () {
+    private void angles () {
 
         double result = 0;
         Point Gx_Gy;
         double [] ang_bif=new double[3];
 
 
+
         ArrayList<Point> visitados = new ArrayList<>();
 
         for (minucia m : minucias) {//cada minucia
+
+            result=0;//se limpia despues de cada minucia
 
             if (m.tipo == 1) {//minucias corte
 
@@ -731,12 +738,18 @@ metodo de show(conversion) imgRandom->Image?????
                 Gx_Gy.x = visitados.get(visitados.size() - 1).x - visitados.get(0).x;//xf-xi
                 Gx_Gy.y = visitados.get(visitados.size() - 1).y - visitados.get(0).y;//yf-yi
 
-                calculate(Gx_Gy);
+               result=calculate(Gx_Gy);
+
+                for(minucia a:minucias){
+                    if(a.equals(m))//cuando encuentre la minucia
+                        a.setAngulo(result);//le pongo su angulo
+                }
+
 
             }
 
 
-            else{//bifurcacion tiene que sacar 6 vecinos por rama 18
+            else{//bifurcacion tiene que sacar 6 vecinos por rama; 18
 
                 visitados.clear();
 
@@ -754,36 +767,78 @@ metodo de show(conversion) imgRandom->Image?????
                     }
 
                     finally {
-                        double f=0;
+
 
 
                         ang_bif[z]=calculate(Gx_Gy);//guardo los angulos de cada
 
-                        for (double d:ang_bif){
-                            f+=d;
                         }
-
-                        System.out.println("ang bifurcacion: "+f/3);
-
-
-
-                    }
-
-
-
-
                 }
 
+                //ya tengo los tres angulos de las ramas
+                double f=0;
+                for (double d:ang_bif){
+                    f+=d;
+                }
 
+                result=f/3;
 
-
-
+                for(minucia a:minucias){
+                    if(a.equals(m))
+                        a.setAngulo(result);
+                }
             }
 
 
         }
 
     }
+
+    private void record_log(){
+
+        FileWriter fichero = null;
+        PrintWriter pw = null;
+
+        try {
+            fichero = new FileWriter("information.log");
+            pw = new PrintWriter(fichero);
+
+            pw.println("Tipo       Coordenadas      Ángulo");
+            pw.println("----------------------------------");
+
+            for(minucia m:minucias) {
+
+                if(m.getTipo()==1){//corte
+
+                    pw.println("Corte       "+m.cordenadas.x+","+m.cordenadas.y+"    "+m.getAngulo());
+
+
+                }
+
+                else{//bifurcacion
+
+                    pw.println("Bifurcación       "+m.cordenadas.x+","+m.cordenadas.y+"    "+m.getAngulo());
+
+
+                }
+
+
+            }
+
+
+            fichero.close();
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText("Se ha generado un archivo information.log con el resumen del proceso.");
+            alert.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
 
     private void interest_region(){
@@ -884,14 +939,40 @@ metodo de show(conversion) imgRandom->Image?????
             this.tipo = tipo;
 
             this.cordenadas = cordenadas;
+            angulo=0.0;
         }
 
-        int tipo;//1 corte
-        Point cordenadas;//3 bifurcacion
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+
+        /* Check if o is an instance of minucia or not
+          "null instanceof [type]" also returns false */
+            if (!(o instanceof minucia)) {
+                return false;
+            }
+
+            minucia m = (minucia) o;
+
+            // Compare the data members and return accordingly
+            return  this.cordenadas.equals(m.cordenadas) && this.tipo==m.tipo;
+        }
 
 
+        int tipo;//1 corte 3 bifurcacion
+        Point cordenadas;//
+        double angulo;
 
 
+        public double getAngulo() {
+            return angulo;
+        }
+
+        public void setAngulo(double angulo) {
+            this.angulo = angulo;
+        }
     }
 
 
@@ -960,6 +1041,8 @@ metodo de show(conversion) imgRandom->Image?????
     }
 
 }
+
+
 
 
 
