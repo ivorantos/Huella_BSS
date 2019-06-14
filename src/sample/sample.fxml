@@ -11,7 +11,7 @@
 <?import javafx.scene.paint.LinearGradient?>
 <?import javafx.scene.paint.Stop?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" prefHeight="640.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" onMouseClicked="#click" prefHeight="640.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <children>
     <HBox alignment="CENTER_RIGHT" prefHeight="500.0" prefWidth="400.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
       <children>
@@ -111,7 +111,7 @@
         </HBox>
       </children>
     </HBox>
-      <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0" prefHeight="14.0" prefWidth="323.0" showTickLabels="true" value="127.0" visible="false" />
+      <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0" onMouseClicked="#click" prefHeight="14.0" prefWidth="323.0" showTickLabels="true" showTickMarks="true" value="127.0" visible="false" />
       <Label fx:id="umbral" layoutX="379.0" layoutY="684.0" text="Umbral:" visible="false" />
   </children>
 </AnchorPane>
