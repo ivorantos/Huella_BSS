@@ -2,21 +2,27 @@ package sample;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXSlider;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.awt.*;
 import javax.imageio.ImageIO;
+import javax.swing.event.ChangeListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
@@ -35,6 +41,10 @@ public class Controller {
 
     private int corte=0;
     private int bifurcacion=0;
+
+    private int paso=0;
+
+    ObservableList<String> OptionsList= FXCollections.observableArrayList("Cargar","Grises","Histograma","B/N","Filtros","Adelgazamiento","Minucias","Ángulos");
 
 
     @FXML
@@ -67,32 +77,60 @@ public class Controller {
     private Button min;
 
     @FXML
+    private ChoiceBox <String> options;
+
+    @FXML
     void click(MouseEvent event) {
 
-        double g=slider.getValue();
+        if(paso==4) {
+
+            double g = slider.getValue();
 
 
-        int[][] mat = new int[image_finger_ant.getWidth()][image_finger_ant.getHeight()];//matriz del mismo tamaño
+            int[][] mat = new int[image_finger_ant.getWidth()][image_finger_ant.getHeight()];//matriz del mismo tamaño
 
 
-        for (int x = 0; x < image_finger_ant.getWidth(); x++) {
-            for (int y = 0; y < image_finger_ant.getHeight(); y++){
+            for (int x = 0; x < image_finger_ant.getWidth(); x++) {
+                for (int y = 0; y < image_finger_ant.getHeight(); y++) {
 
 
-                if(image_finger_ant.getPixel(x,y)<g){
+                    if (image_finger_ant.getPixel(x, y) < g) {
 
-                    mat[x][y] = 0;} //negro
-                else{
-                    mat[x][y] = 1;//blanco
+                        mat[x][y] = 0;
+                    } //negro
+                    else {
+                        mat[x][y] = 1;//blanco
+                    }
                 }
             }
+
+            image_finger_act = new FingerPrintImage(mat, FingerPrintImage.Fase.BN);
+
+            Show(0);
+
+
         }
-
-        image_finger_act=new FingerPrintImage(mat, FingerPrintImage.Fase.BN);
-
-        Show(0);
-
     }
+
+    @FXML
+    private void initialize(){
+        options.setItems(OptionsList);
+
+        options.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> System.out.println(oldValue));
+    }
+
+
+
+
+//    options.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener() {
+//
+//        @Override public void changed(ObservableValue ov, Number oldSelected, Number newSelected) {
+//
+//            System.out.println("Old Selected Option: " + options.get(oldSelected.intValue()));
+//            System.out.println("New Selected Option: " +options.get(newSelected.intValue()));
+//
+//        }
+//    });
 
 
 

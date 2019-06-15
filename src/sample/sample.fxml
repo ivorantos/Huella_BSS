@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXSlider?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -113,5 +114,6 @@
     </HBox>
       <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0" onMouseClicked="#click" prefHeight="14.0" prefWidth="323.0" showTickLabels="true" showTickMarks="true" value="127.0" visible="false" />
       <Label fx:id="umbral" layoutX="379.0" layoutY="684.0" text="Umbral:" visible="false" />
+      <ChoiceBox fx:id="options" layoutX="568.0" layoutY="722.0" prefWidth="150.0" />
   </children>
 </AnchorPane>
