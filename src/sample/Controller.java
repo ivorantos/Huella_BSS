@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,8 @@ public class Controller {
     ObservableList<String> OptionsList = FXCollections.observableArrayList("Cargar", "Grises", "Histograma", "B/N", "Filtros", "Adelgazamiento", "Minucias", "Ángulos", "Limpiar");
 
 
+    LinkedList <FingerPrintImage> undo;
+
     @FXML
     private ImageView img_viewer1;
 
@@ -65,6 +68,9 @@ public class Controller {
     @FXML
     private JFXButton BN;
 
+    @FXML
+    private JFXButton Auto;
+
     private BufferedImage image_buffer;//buffer de la imagen actual
 
     private FingerPrintImage image_finger_act;//fingerPrint de la imagen actual (se pisa constantemente)
@@ -79,6 +85,9 @@ public class Controller {
 
     @FXML
     private ChoiceBox<String> options;
+
+    @FXML
+    private ChoiceBox<String> pila;
 
     @FXML
     void click(int g) {
@@ -116,7 +125,52 @@ public class Controller {
 
         options.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> main(OptionsList.get(newValue.intValue())));
 
+        pila.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> back(newValue.intValue()));
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> click(newValue.intValue()));
+
+        Auto.setVisible(true);
+
+        undo=new LinkedList<FingerPrintImage>();
+
+
+    }
+
+    private void back(int i) {
+
+        if(i>=0) {
+
+            slider.setVisible(false);
+
+            FingerPrintImage aux=new FingerPrintImage(undo.get(i));
+
+            paso = i + 2;
+
+            if (paso == 4)
+                slider.setVisible(true);
+
+//        image_finger_ant=new FingerPrintImage(undo.get(i));
+            image_finger_act = new FingerPrintImage(aux);
+
+            while (undo.size() - (i) > 0) {
+
+                undo.removeLast();
+
+            }
+
+            pila.getItems().clear();
+
+            for (FingerPrintImage f : undo) {
+                pila.getItems().add(f.getFase().toString());
+            }
+
+            if (i == 0 || i == 1)
+                Show(1,aux);
+            else
+                Show(0,aux);
+
+        }
+
     }
 
 
@@ -185,6 +239,29 @@ metodo de show(conversion) imgRandom->Image?????
 
     }
 
+
+    private void Show(int modo,FingerPrintImage f) {
+
+
+        BufferedImage buffer = new BufferedImage(f.getWidth(), f.getHeight(), BufferedImage.TYPE_INT_RGB);//buffered salida
+
+        for (int i = 0; i < f.getWidth(); i++) {//anchura(numero de columnas y); va cambiando la x cartesiana
+            for (int j = 0; j < f.getHeight(); j++) {//altura (numero de filas x); va cambiando la y cartesiana
+
+                int valor = f.getPixel(i, j);
+                if (modo == 0) {//B/N
+                    valor = valor * 255;
+
+                }
+                int pixelRGB = (255 << 24 | valor << 16 | valor << 8 | valor);
+
+                buffer.setRGB(i, j, pixelRGB);
+            }
+        }
+
+        img_viewer2.setImage(SwingFXUtils.toFXImage(buffer, null));//Buffer to image para pintar
+
+    }
 
     /**
      * Paso de la finger actual a (Buffer y a ->) Image para pintarla en pantalla
@@ -369,6 +446,42 @@ metodo de show(conversion) imgRandom->Image?????
 
     }
 
+    public void auto(){
+
+        try {
+            clean();
+            chooseFile();
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            RGB2Grey();
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            Grey2Hist();
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            Hist2BN((int) slider.getValue());
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            filterImg(1);//filtro 1
+            filterImg(2);//filtro 2
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            thinning();
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            minucias();
+
+            image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+            angles();
+            record_log();
+
+        } catch (IOException e) {
+            System.err.println("PROBLEM during choose file");
+        }
+
+
+    }
+
 
     private void minucias() {
 
@@ -431,6 +544,7 @@ metodo de show(conversion) imgRandom->Image?????
 
         }
 
+        image_finger_act.setFase(FingerPrintImage.Fase.MIN);
 
         img_viewer2.setImage(SwingFXUtils.toFXImage(b, null));//se muestra aqui directamente porque se usa el buffer con las minucias marcadas
 
@@ -439,9 +553,18 @@ metodo de show(conversion) imgRandom->Image?????
 
     public void main(String s) {
 
+//        System.out.println(undo.size());
+
 
         slider.setVisible(false);//las escondo
         umbral.setVisible(false);
+
+        if(s!="Limpiar")//si no es nueva foto no permito el auto
+        Auto.setVisible(false);
+
+
+
+
 
 
         switch (s) {
@@ -463,8 +586,11 @@ metodo de show(conversion) imgRandom->Image?????
                 paso++;
 
                 try {
+                    undo.clear();
                     clean();
                     chooseFile();
+                   // undo.addLast(new FingerPrintImage(image_finger_act));//meto la que corresponde en el deshacer
+
 
                 } catch (IOException e) {
                     System.err.println("PROBLEM during choose file");
@@ -483,9 +609,17 @@ metodo de show(conversion) imgRandom->Image?????
                     else
                         paso = 0;
 
+
                 }
 
+                Auto.setVisible(true);//siempre que limpio lo pongo visible
+                undo.clear();
+                pila.getItems().clear();//añado en el select
+
+
                 clean();
+                paso = 0;
+
                 break;
 
             case "Grises":
@@ -496,7 +630,11 @@ metodo de show(conversion) imgRandom->Image?????
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
                     RGB2Grey();
+
+
+                   // Show(1,undo.getFirst());
                     Show(1);//pinto
+
 
                 }
 
@@ -516,7 +654,13 @@ metodo de show(conversion) imgRandom->Image?????
 
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
+
                     Grey2Hist();
+
+
                     Show(1);
 
                 } else{
@@ -537,8 +681,12 @@ metodo de show(conversion) imgRandom->Image?????
                     umbral.setVisible(true);
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
+
                     Hist2BN((int) slider.getValue());
-//                interest_region();
+
+
 
                     Show(0);
 
@@ -555,8 +703,14 @@ metodo de show(conversion) imgRandom->Image?????
                     paso++;
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
+
                     filterImg(1);//filtro 1
                     filterImg(2);//filtro 2
+
+
+
                     Show(0);
                 } else{
                     info_alert();
@@ -571,7 +725,16 @@ metodo de show(conversion) imgRandom->Image?????
                     paso++;
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
                     thinning();
+
+//                    interest_region();
+
+
+
+
                     Show(0);
 
                 } else{
@@ -586,7 +749,13 @@ metodo de show(conversion) imgRandom->Image?????
                     paso++;
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
+
                     minucias();//ya se muestra desde aqui
+
+
                 } else{
                     info_alert();
                 }
@@ -600,6 +769,10 @@ metodo de show(conversion) imgRandom->Image?????
                     paso++;
 
                     image_finger_ant = new FingerPrintImage(image_finger_act);//antes de trabajar sobre la actual la guardo
+
+                    undo.addLast(new FingerPrintImage(image_finger_ant));//meto la que corresponde en el deshacer
+                    pila.getItems().add(image_finger_ant.getFase().toString());//añado en el select
+
                     angles();
                     record_log();
                 } else{
@@ -714,11 +887,22 @@ metodo de show(conversion) imgRandom->Image?????
 
         Point v[] = new Point[nbrs.length - 1];//vecinos
         Point next = new Point(9, 9, -88);//siguiente nulo
+
+
         Boolean x = false;
+        int a=nbrs.length;
 
         for (int i = 0; i < nbrs.length - 1; i++) {
 
-            Point punto = new Point((p.x + nbrs[i][1]), (p.y + nbrs[i][0]), image_finger_act.getImagen()[(p.x + nbrs[i][1])][(p.y + nbrs[i][0])]);
+
+            Point punto = null;
+            try {
+                punto = new Point((p.x + nbrs[i][1]), (p.y + nbrs[i][0]), image_finger_act.getImagen()[(p.x + nbrs[i][1])][(p.y + nbrs[i][0])]);
+            } catch (Exception e) {
+                return next;
+
+            }
+
             v[i] = punto;
         }
 
@@ -925,72 +1109,82 @@ metodo de show(conversion) imgRandom->Image?????
 
 
 
-    private void interest_region(){
-
-        int c=0;
-
-        int x=0;
-        int y=0;
-        int xi=0;
-        int yi=0;
-
-
-
-        for (int i=0;i<image_finger_act.getWidth();i++){
-            c=0;
-            for (int j=0;j<image_finger_act.getHeight();j++){
-
-                if(image_finger_act.getPixel(i,j)==0)//negro
-                    c++;
-
-            }
-
-            if(c>25){
-
-                x=i;
-                break;
-            }
-        }
-
-        c=0;
-
-        for (int i=image_finger_act.getWidth()-1;i>=0;i--){
-            for (int j=image_finger_act.getHeight()-1;j>=0;j--) {
-
-                if(image_finger_act.getPixel(i,j)==0)//negro
-                    c++;
-              }
-
-            if(c>25) {
-
-                xi = i;
-                break;
-            }
-        }
-
-            for (int j=0;j<image_finger_act.getHeight();j++) {
-
-                if (image_finger_act.getPixel(x,j)==0)//primer pixel negro en la fila marcada por arriba
-                    y=j;
-
-
-            }
-
-
-
-            for (int j=image_finger_act.getHeight()-1;j>0;j--) {
-
-                if (image_finger_act.getPixel(x,j)==0)
-                    yi=j;
-
-        }
-
-
-        image_finger_act=new FingerPrintImage(image_finger_act,x,y,xi,yi);
-
-
-    }
-
+//    private void interest_region(){
+//
+//        int c=0;
+//
+//        int x=0;
+//        int y=0;
+//        int xi=0;
+//        int yi=0;
+//
+//
+//
+//        for (int i=0;i<image_finger_act.getWidth();i++){
+//            c=0;
+//            for (int j=0;j<image_finger_act.getHeight();j++){
+//
+//                if(image_finger_act.getPixel(i,j)==0)//negro
+//                    c++;
+//
+//            }
+////            System.out.println(c);
+//
+//            if(c>28){
+//
+//                x=i;
+//                break;
+//            }
+//        }
+//
+//        c=0;
+//
+//        for (int i=image_finger_act.getWidth()-1;i>=0;i--){
+//            for (int j=image_finger_act.getHeight()-1;j>=0;j--) {
+//
+//                if(image_finger_act.getPixel(i,j)==0)//negro
+//                    c++;
+//              }
+//
+//            if(c>28) {
+//
+//                xi = i;
+//                break;
+//            }
+//        }
+//
+//            for (int j=0;j<image_finger_act.getWidth();j++) {
+//
+//                if (image_finger_act.getPixel(x,j)==0){ //primer pixel negro en la fila marcada por arriba
+//                    y=j;
+//                    break;
+//
+//
+//                }
+//
+//
+//
+//            }
+//
+//
+//
+//            for (int j=image_finger_act.getWidth()-1;j>-1;j--) {
+//
+//                if (image_finger_act.getPixel(x,j)==0){
+//                    yi=j;
+//                    break;
+//
+//                }
+//
+//
+//        }
+//
+//
+//        image_finger_act=new FingerPrintImage(image_finger_act,x,y,xi,yi);
+//
+//
+//    }
+//
 
 
     class minucia{

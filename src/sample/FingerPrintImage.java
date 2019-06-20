@@ -6,7 +6,7 @@ public class FingerPrintImage {
 
 
 
-    public enum Fase { CARGA, ESCALA_GR,HIST,BN,FILTER,THIN}
+    public enum Fase { CARGA, ESCALA_GR,HIST,BN,FILTER,THIN,MIN}
 
     private int [] [] imagen;//matriz de imagen
 
@@ -37,25 +37,28 @@ public class FingerPrintImage {
      */
     public FingerPrintImage(FingerPrintImage f) {
 
-        imagen=f.getImagen();
+        imagen=new int[f.getWidth()][f.getHeight()];
+
+        for(int i=0; i<imagen.length; i++)
+            for(int j=0; j<imagen[i].length; j++)
+                imagen[i][j]=f.getImagen()[i][j];
+
+
         this.fase = f.fase;
     }
 
     public FingerPrintImage(FingerPrintImage f,int x,int y,int xi,int yi){
 
         fase=f.fase;
-        imagen=new int[xi-x][yi-y];//+1???
+        imagen=new int[(xi-x)+1][(yi-y)+1];
 
         for (int i=x;i<xi;i++){
-            for (int j=y;y<yi;y++){
+            for (int j=y;j<yi;j++){
 
                 int r=i-x;
                 int c=j-y;
 
                 imagen[r][c]=f.getPixel(i,j);
-
-
-
 
             }
         }

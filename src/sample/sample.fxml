@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXSlider?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -8,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0"  prefHeight="640.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-1.0" minWidth="-1.0" prefHeight="640.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
   <children>
     <HBox alignment="CENTER_RIGHT" prefHeight="500.0" prefWidth="400.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="60.0">
       <children>
@@ -26,30 +27,34 @@
     </HBox>
     <HBox alignment="BOTTOM_CENTER" prefHeight="114.0" prefWidth="789.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            <Label text="Volver a:">
                <HBox.margin>
-                  <Insets right="-10.0" />
+                  <Insets bottom="80.0" right="-70.0" />
                </HBox.margin>
-            </HBox>
-            <HBox prefHeight="100.0" prefWidth="200.0">
+            </Label>
+            <ChoiceBox fx:id="pila" prefWidth="150.0">
                <HBox.margin>
-                  <Insets right="-10.0" />
+                  <Insets bottom="40.0" />
                </HBox.margin>
-            </HBox>
-        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+            </ChoiceBox>
+            <JFXButton fx:id="Auto" onAction="#auto" style="-fx-background-color: #ffa74f;" text="Auto">
                <HBox.margin>
-                  <Insets right="-10.0" />
+                  <Insets bottom="40.0" left="150.0" right="80.0" />
                </HBox.margin>
-        </HBox>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+            </JFXButton>
+            <ChoiceBox fx:id="options" prefWidth="150.0">
                <HBox.margin>
-                  <Insets right="-10.0" />
+                  <Insets bottom="40.0" left="100.0" />
                </HBox.margin>
-        </HBox>
+            </ChoiceBox>
+            <Label text="Realizar acción:">
+               <HBox.margin>
+                  <Insets bottom="80.0" left="-100.0" />
+               </HBox.margin>
+            </Label>
       </children>
     </HBox>
-      <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0"  prefHeight="14.0" prefWidth="323.0" showTickLabels="true" showTickMarks="true" value="127.0" visible="false" />
+      <JFXSlider fx:id="slider" layoutX="463.0" layoutY="684.0" majorTickUnit="50.0" max="255.0" prefHeight="14.0" prefWidth="323.0" showTickLabels="true" showTickMarks="true" value="127.0" visible="false" />
       <Label fx:id="umbral" layoutX="379.0" layoutY="684.0" text="Umbral:" visible="false" />
-      <ChoiceBox fx:id="options" layoutX="568.0" layoutY="722.0" prefWidth="150.0" />
   </children>
 </AnchorPane>
